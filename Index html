@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЕГЭ-Навигатор — Инструмент рациональной подготовки к ЕГЭ</title>
+    <!-- Подключение Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключение шрифта Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Иконки Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        },
+                        indigoAccent: {
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .nav-link.active {
+            color: #2563eb;
+            background-color: #eff6ff;
+            font-weight: 600;
+        }
+        /* Плавная анимация прогресс-баров */
+        .progress-bar-fill {
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Кастомный скроллбар для таблицы на мобильных */
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-600 selection:text-white">
+
+    <!-- Фиксированная верхняя навигация -->
+    <header class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-slate-200/80 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Логотип -->
+                <a href="#hero" class="flex items-center gap-2.5 group">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-600 to-indigoAccent-600 flex items-center justify-center text-white shadow-md shadow-brand-600/20 group-hover:scale-105 transition-transform">
+                        <i data-lucide="compass" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-lg tracking-tight text-slate-900">ЕГЭ-Навигатор</span>
+                        <span class="hidden sm:inline-block ml-2 text-[11px] font-medium px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 border border-brand-100">Проект 10 класс</span>
+                    </div>
+                </a>
+
+                <!-- Десктопное меню -->
+                <nav class="hidden lg:flex items-center gap-1" id="desktop-nav">
+                    <a href="#about" class="nav-link px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-brand-600 hover:bg-slate-100/70 transition-colors">О проекте</a>
+                    <a href="#resources" class="nav-link px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-brand-600 hover:bg-slate-100/70 transition-colors">Ресурсы</a>
+                    <a href="#comparison" class="nav-link px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-brand-600 hover:bg-slate-100/70 transition-colors">Сравнение</a>
+                    <a href="#methodology" class="nav-link px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-brand-600 hover:bg-slate-100/70 transition-colors">Методика и план</a>
+                    <a href="#research" class="nav-link px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-brand-600 hover:bg-slate-100/70 transition-colors">Исследование</a>
+                    <a href="#survey" class="nav-link px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-brand-600 hover:bg-slate-100/70 transition-colors">Анкета</a>
+                </nav>
+
+                <!-- Кнопка мобильного меню -->
+                <button id="mobile-menu-btn" type="button" class="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none" aria-label="Открыть меню">
+                    <i data-lucide="menu" class="w-6 h-6" id="menu-icon-open"></i>
+                    <i data-lucide="x" class="w-6 h-6 hidden" id="menu-icon-close"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Выпадающее мобильное меню -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-1 shadow-lg">
+            <a href="#about" class="mobile-nav-link block px-3 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-600">О проекте и калькулятор</a>
+            <a href="#resources" class="mobile-nav-link block px-3 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-600">Банк ресурсов</a>
+            <a href="#comparison" class="mobile-nav-link block px-3 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-600">Сравнение платформ</a>
+            <a href="#methodology" class="mobile-nav-link block px-3 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-600">Методика и чек-лист</a>
+            <a href="#research" class="mobile-nav-link block px-3 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-600">Результаты опроса (n=48)</a>
+            <a href="#survey" class="mobile-nav-link block px-3 py-2.5 rounded-xl text-base font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-600">Пройти анкету</a>
+        </div>
+    </header>
+
+    <!-- 1. ГЛАВНАЯ (HERO-БЛОК) -->
+    <section id="hero" class="pt-28 pb-16 sm:pt-36 sm:pb-24 bg-gradient-to-b from-brand-50/80 via-white to-slate-50 border-b border-slate-200/60 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-brand-200 shadow-sm text-brand-700 text-xs sm:text-sm font-medium mb-6">
+                    <span class="flex h-2 w-2 rounded-full bg-brand-600 animate-pulse"></span>
+                    Индивидуальный исследовательский проект • 10 класс
+                </div>
+                
+                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15] mb-6">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-indigoAccent-600">«ЕГЭ-Навигатор»</span> — твой путеводитель по рациональной подготовке к ЕГЭ
+                </h1>
+                
+                <p class="text-base sm:text-xl text-slate-600 leading-relaxed max-w-3xl mx-auto mb-9">
+                    Как не переплачивать десятки тысяч рублей за репетиторов и курсы, используя официальные базы <strong>ФИПИ</strong>, тренажёр <strong>«Решу ЕГЭ»</strong> и точечное обучение только по самым сложным темам.
+                </p>
+
+                <!-- Кнопки действий -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
+                    <a href="#methodology" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-semibold shadow-lg shadow-brand-600/25 transition-all hover:-translate-y-0.5">
+                        <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                        Перейти к плану подготовки
+                    </a>
+                    <a href="#survey" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-semibold border border-slate-200 shadow-sm transition-all hover:-translate-y-0.5">
+                        <i data-lucide="clipboard-list" class="w-5 h-5 text-indigoAccent-600"></i>
+                        Пройти опрос
+                    </a>
+                </div>
+
+                <!-- Блок ключевых цифр проекта -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
+                    <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="text-3xl sm:text-4xl font-extrabold text-brand-600 mb-1">0 ₽</div>
+                        <div class="text-sm font-semibold text-slate-800">Базовая стратегия</div>
+                        <p class="text-xs text-slate-500 mt-1">Официальный банк ФИПИ + «Решу ЕГЭ»</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="text-3xl sm:text-4xl font-extrabold text-indigoAccent-600 mb-1">60 / 20 / 20</div>
+                        <div class="text-sm font-semibold text-slate-800">Формула баланса</div>
+                        <p class="text-xs text-slate-500 mt-1">Практика, теория и работа над ошибками</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="text-3xl sm:text-4xl font-extrabold text-emerald-600 mb-1">79%</div>
+                        <div class="text-sm font-semibold text-slate-800">Одобрение при апробации</div>
+                        <p class="text-xs text-slate-500 mt-1">Учащихся готовы использовать сайт (n=48)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. О ПРОЕКТЕ (ПАСПОРТ ИССЛЕДОВАНИЯ И КАЛЬКУЛЯТОР СТРАТЕГИИ) -->
+    <section id="about" class="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-3 py-1 rounded-full">Паспорт исследования</span>
+            <h2 class="text-2xl sm:text-4xl font-bold text-slate-900 mt-3 mb-4">О проекте и его научной основе</h2>
+            <p class="text-slate-600 text-sm sm:text-base">
+                Мы проанализировали рынок образовательных платформ и провели анкетирование старшеклассников, чтобы устранить хаос в подготовке к выпускным экзаменам.
+            </p>
+        </div>
+
+        <!-- Карточки Паспорта -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14">
+            <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-sm flex gap-4">
+                <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                    <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">Проблема</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        При избытке образовательных материалов старшеклассники не умеют выбирать эффективные и экономные способы подготовки: тратят крупные суммы на случайные курсы и не знают о бесплатных официальных источниках ФИПИ.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-sm flex gap-4">
+                <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
+                    <i data-lucide="target" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">Цель проекта</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Выявить эффективные и экономичные комбинации ресурсов для подготовки к ЕГЭ, упаковать результаты исследования в удобный сайт-навигатор и оценить его востребованность среди учеников 10–11 классов.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-sm flex gap-4">
+                <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigoAccent-600 flex items-center justify-center shrink-0">
+                    <i data-lucide="lightbulb" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">Гипотеза</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Сочетание бесплатных официальных ресурсов (ФИПИ, «Решу ЕГЭ») с одним специализированным платным курсом даёт результат не ниже, чем исключительно дорогие онлайн-школы, при значительно меньших затратах.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-sm flex gap-4">
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                    <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">Главный вывод</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Гипотеза подтвердилась: платформы не конкурируют, а дополняют друг друга. Рациональная комбинация снижает финансовую нагрузку на семью в среднем на <strong>65–75%</strong> без потери качества подготовки.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Интерактивный калькулятор экономии / подборщик стратегии -->
+        <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 rounded-3xl p-6 sm:p-10 text-white shadow-xl">
+            <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+                <!-- Левая часть: настройки -->
+                <div class="w-full lg:w-1/2 space-y-6">
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-brand-300 bg-brand-900/50 border border-brand-700/50 px-3 py-1 rounded-full mb-3">
+                            <i data-lucide="calculator" class="w-3.5 h-3.5"></i>
+                            Интерактивный инструмент
+                        </span>
+                        <h3 class="text-2xl sm:text-3xl font-bold">Подборщик стратегии и калькулятор экономии</h3>
+                        <p class="text-slate-300 text-sm mt-2">
+                            Укажи количество сдающих предметов и свой уровень самоорганизации, чтобы рассчитать оптимальную комбинацию ресурсов и экономию за 9 месяцев учебного года.
+                        </p>
+                    </div>
+
+                    <!-- Выбор количества предметов -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-200 mb-2.5">1. Сколько предметов ЕГЭ планируешь сдавать?</label>
+                        <div class="grid grid-cols-3 gap-3" id="calc-subjects-group">
+                            <button type="button" data-subjects="3" class="calc-subject-btn py-3 px-4 rounded-xl border text-sm font-semibold transition-all border-slate-600 bg-slate-800/60 text-slate-300 hover:border-brand-400">
+                                3 предмета
+                            </button>
+                            <button type="button" data-subjects="4" class="calc-subject-btn py-3 px-4 rounded-xl border text-sm font-semibold transition-all border-brand-500 bg-brand-600 text-white shadow-lg shadow-brand-600/30">
+                                4 предмета
+                            </button>
+                            <button type="button" data-subjects="5" class="calc-subject-btn py-3 px-4 rounded-xl border text-sm font-semibold transition-all border-slate-600 bg-slate-800/60 text-slate-300 hover:border-brand-400">
+                                5 предметов
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Выбор уровня самодисциплины -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-200 mb-2.5">2. Какой у тебя уровень самодисциплины?</label>
+                        <div class="space-y-2.5" id="calc-discipline-group">
+                            <button type="button" data-discipline="high" class="calc-discipline-btn w-full text-left p-3.5 rounded-xl border transition-all border-slate-600 bg-slate-800/60 text-slate-300 hover:border-brand-400 flex items-center justify-between">
+                                <div>
+                                    <div class="font-semibold text-sm">Высокий (могу заниматься сам по плану)</div>
+                                    <div class="text-xs text-slate-400">Нужны только эталонные задания и тренажёры</div>
+                                </div>
+                                <i data-lucide="award" class="w-5 h-5 text-slate-400 shrink-0"></i>
+                            </button>
+
+                            <button type="button" data-discipline="medium" class="calc-discipline-btn w-full text-left p-3.5 rounded-xl border transition-all border-brand-500 bg-brand-600/20 text-white flex items-center justify-between">
+                                <div>
+                                    <div class="font-semibold text-sm text-brand-200">Средний (оптимальная комбинация)</div>
+                                    <div class="text-xs text-slate-300">Базу учу сам, но нужен 1 курс на самый сложный предмет</div>
+                                </div>
+                                <i data-lucide="sparkles" class="w-5 h-5 text-brand-400 shrink-0"></i>
+                            </button>
+
+                            <button type="button" data-discipline="low" class="calc-discipline-btn w-full text-left p-3.5 rounded-xl border transition-all border-slate-600 bg-slate-800/60 text-slate-300 hover:border-brand-400 flex items-center justify-between">
+                                <div>
+                                    <div class="font-semibold text-sm">Нужна жёсткая система и контроль куратора</div>
+                                    <div class="text-xs text-slate-400">Сложно заставить себя без дедлайнов и вебинаров</div>
+                                </div>
+                                <i data-lucide="shield-check" class="w-5 h-5 text-slate-400 shrink-0"></i>
+                            </button>
+                        </div>
+                    </div>
+                </
